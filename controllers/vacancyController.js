@@ -3,10 +3,12 @@ const vacancy = require("../models/Vacancy");
 
 class vacancyController {
   static post = (req, res) => {
-    const { companyName, position, description, deadline, companyLogo } =
-      req.body;
+    const { companyName, position, description, deadline } = req.body;
 
     const file = req.files.companyLogo;
+
+    console.log("yo", file);
+
     const timestamp = Date.now();
 
     const fileName = `photo_${timestamp}.jpeg`;
@@ -74,7 +76,7 @@ class vacancyController {
         }
         return res.status(404).send({ error: "No new Vacancies found!" });
       })
-      .catch((error) => res.status(500).send({ error: error.message }));
+      .catch((error) => res.status(500).end());
   };
 
   static delete = (req, res) => {
