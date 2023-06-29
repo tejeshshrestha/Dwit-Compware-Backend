@@ -1,47 +1,42 @@
 const { validationResult } = require("express-validator");
-const blog = require("../models/blog");
+const notifications = require("../models/Notifications");
 
-class blogController {
+class notificationController {
   static post = (req, res) => {
-    const { title, date, author, article } = req.body;
-    const file = req.files.logo;
-    console.log("this", file);
-    const timestamp = Date.now();
-    const fileName = `photo_${timestamp}.jpeg`;
+    const { footer, link } = req.body;
+    const file = req.files.image;
 
-    file.mv(`./storage/${fileName}`, (error) => {
+    const timestamp = Date.now();
+    const filename = `photo_${timestamp}.jpeg`;
+
+    file.mv(`./storage/${filename}`, (error) => {
       if (error) {
         return res.status(500).send(error);
       }
-      console.log("File Uploaded");
+      console.log("Upload Successful");
     });
 
-    const Blog = new blog({
-      title,
-      date,
-      author,
-      logo: fileName,
-      article,
+    const Noti = new notifications({
+      image: filename,
+      footer,
+      link,
     });
-
-    Blog.save()
+    Noti.save()
       .then((result) => res.send(result))
       .catch((error) => res.send(error));
   };
 
   static get = (req, res) => {
-    blog
+    notifications
       .find({})
       .then((result) => res.send(result))
       .catch((error) => res.status(500).send({ error: error.message }));
   };
-
   static patch = (req, res) => {
-    const { title, date, author, logo, article } = req.body;
-    const blogId = req.params.id;
-
-    if (logo) {
-      const file = req.files.logo;
+    const { image, footer, link } = req.body;
+    const notificationId = req.params.id;
+    if (image) {
+      const file = req.files.image;
       const timestamp = Date.now();
       const fileName = `photo_${timestamp}.jpeg`;
 
@@ -49,44 +44,44 @@ class blogController {
         if (error) {
           return res.status(500).send(error);
         }
-        console.log("File Uploaded!");
+        console.log("Upload Successful!");
       });
-      logo = fileName;
+      image = fileName;
     }
-    blog
+    notifications
       .findByIdAndUpdate(
-        blogId,
+        notificationId,
         {
-          title,
-          date,
-          author,
-          logo,
-          article,
+          image,
+          footer,
+          link,
         },
         { new: true }
       )
-      .then((updatedBlog) => {
-        if (updatedBlog) {
-          res.send(updatedBlog);
+      .then((updatedNoti) => {
+        if (updatedNoti) {
+          res.send(updatedNoti);
         }
-        return res.status(404).send({ error: "No new Vacancies found!" });
+        return res.status(404).send({ error: "Not Added" });
       })
       .catch((error) => res.status(500).end());
   };
-  static getOneBlog = (req, res) => {
+
+  static getOneNoti = (req, res) => {
     const Id = req.params.id;
-    blog
+    notifications
       .findOne({ _id: Id })
       .then((result) => res.send(result))
       .catch((error) => res.status(500).send({ error: error.message }));
   };
+
   static delete = (req, res) => {
     const Id = req.params.id;
-    blog
+    notifications
       .deleteOne({ _id: Id })
-      .then(() => res.send("Deleted Successfully"))
+      .then(() => res.send("It's been Deleted!"))
       .catch((error) => res.status(500).send({ error: error.message }));
   };
 }
 
-module.exports = blogController;
+module.exports = notificationController;

@@ -22,6 +22,11 @@ const factRoutes = require("./routes/factRoutes");
 const courseRoutes = require("./routes/courseRouter");
 const testimonialRoutes = require("./routes/testimonialRouter");
 const vacancyRoutes = require("./routes/vacancyRouter");
+const blogRoutes = require("./routes/blogRouter");
+const notificationRoutes = require("./routes/notificationRouter");
+const sessionRoutes = require("./routes/sessionRouter");
+const galleryRoutes = require("./routes/galleryRouter");
+const emailRoutes = require("./routes/emailRouter");
 
 app.use(fileUpload());
 
@@ -30,6 +35,11 @@ app.use("/api/facts", factRoutes);
 app.use("/api/course", courseRoutes);
 app.use("/api/testimonial", testimonialRoutes);
 app.use("/api/vacancy", vacancyRoutes);
+app.use("/api/blog", blogRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/session", sessionRoutes);
+app.use("/api/gallery", galleryRoutes);
+app.use("/api/sendEmail", emailRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({

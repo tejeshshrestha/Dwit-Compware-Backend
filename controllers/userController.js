@@ -1,9 +1,9 @@
-const transporter = require('../config/emailConfig');
-const userModel = require('../models/User');
+const transporter = require("../config/emailConfig");
+const userModel = require("../models/User");
 // to hash password before saving
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
 dotenv.config();
 
 class UserController {
@@ -21,7 +21,7 @@ class UserController {
         //?generate token for link-token
         const token = jwt.sign({ userId: user._id }, secret, {
           // email valid for  15 minutes
-          expiresIn: '15d',
+          expiresIn: "15d",
         });
 
         const link = `${process.env.FRONT_END_LINK}/api/users/reset/${user._id}/${token}`; //! /api/users/react/:id/:token for fronte  nd
@@ -32,7 +32,7 @@ class UserController {
         let info = await transporter.sendMail({
           from: process.env.EMAIL_FROM,
           to: user.email,
-          subject: 'Password Reset Link',
+          subject: "Password Reset Link",
           html: `
           <h1>
           <a href=${link}>
@@ -43,20 +43,20 @@ class UserController {
         });
 
         res.status(200).json({
-          status: 'success',
-          message: 'Email sent successfully',
+          status: "success",
+          message: "Email sent successfully",
           data: info,
         });
       } else {
         res.status(400).json({
-          status: 'failed',
-          message: 'User not found',
+          status: "failed",
+          message: "User not found",
         });
       }
     } else {
       res.status(200).json({
-        status: 'failed',
-        message: 'all fields is required',
+        status: "failed",
+        message: "all fields is required",
       });
     }
   };
@@ -79,9 +79,9 @@ class UserController {
     //to check validation of token -> generate token using same id and secret key that we used while creating token for Link in sendUserPasswordResetEmail Route
     const new_token = user._id + process.env.JWT_SECRET_KEY; //unique secret key for each user
     try {
-      console.log('___token');
+      console.log("___token");
       console.log(token);
-      console.log('___id');
+      console.log("___id");
       console.log(id);
       jwt.verify(token, new_token);
       // check if both has data
@@ -95,25 +95,25 @@ class UserController {
             password: hashedPassword,
           });
           res.status(200).json({
-            status: 'success',
-            message: 'password reset successfully',
+            status: "success",
+            message: "password reset successfully",
           });
         } else {
           res.status(400).json({
-            status: 'failed',
-            message: 'confirm pass dont match',
+            status: "failed",
+            message: "confirm pass dont match",
           });
         }
       } else {
         res.status(400).json({
-          status: 'failed',
-          message: 'Please fill all the fields',
+          status: "failed",
+          message: "Please fill all the fields",
         });
       }
     } catch (err) {
       return res.status(401).json({
-        status: 'failed',
-        message: 'Token is not valid',
+        status: "failed",
+        message: "Token is not valid",
       });
     }
   };
@@ -122,8 +122,8 @@ class UserController {
 
   static getLoggedUserData = async (req, res) => {
     res.status(200).json({
-      status: 'success',
-      message: 'User data fetched successfully',
+      status: "success",
+      message: "User data fetched successfully",
       data: {
         user: req.user,
       },
@@ -145,19 +145,19 @@ class UserController {
           password: hashedPassword,
         }); // i didn't assigned it to "const user =" because this expression just find & updates only but dont return any data
         res.status(200).json({
-          status: 'success',
-          message: 'password changed successfully',
+          status: "success",
+          message: "password changed successfully",
         });
       } else {
         res.status(400).json({
-          status: 'failed',
-          message: 'Password and Confirm Password does not match',
+          status: "failed",
+          message: "Password and Confirm Password does not match",
         });
       }
     } else {
       res.status(400).json({
-        status: 'failed',
-        message: 'Please fill all the fields',
+        status: "failed",
+        message: "Please fill all the fields",
       });
     }
   };
@@ -183,32 +183,32 @@ class UserController {
             const token = jwt.sign(
               { userId: user._id },
               process.env.JWT_SECRET_KEY,
-              { expiresIn: '5d' }
+              { expiresIn: "5d" }
             );
 
             res.status(200).json({
-              status: 'success',
-              message: 'login success',
+              status: "success",
+              message: "login success",
               token: token,
             });
           } else {
             res.status(400).json({
-              status: 'failed',
+              status: "failed",
               message:
-                'Invalid email or password, i dont know which one is wrong , XD',
+                "Invalid email or password, i dont know which one is wrong , XD",
             });
           }
         } else {
           res.status(404).json({
-            status: 'failed',
-            message: 'No user with that email exist',
+            status: "failed",
+            message: "No user with that email exist",
           });
         }
       }
     } catch (err) {
       console.log(err);
       res.status(500).json({
-        message: 'user could not be logged in due to server error',
+        message: "user could not be logged in due to server error",
       });
     }
   };
@@ -219,8 +219,8 @@ class UserController {
     const userAlreadyExist = await userModel.findOne({ email });
     if (userAlreadyExist) {
       res.status(400).json({
-        status: 'failed  ',
-        message: 'User already exists',
+        status: "failed  ",
+        message: "User already exists",
       });
     } else {
       //if user does not exist
@@ -250,33 +250,33 @@ class UserController {
             const token = jwt.sign(
               { userId: user._id },
               process.env.JWT_SECRET_KEY,
-              { expiresIn: '5d' }
+              { expiresIn: "5d" }
             );
 
             //send response to avoid server from keep on sending signal [201-created status code]
             res.status(201).json({
-              status: 'success',
-              message: 'User registered successfully',
+              status: "success",
+              message: "User registered successfully",
               //   !Dont forget to send token to client
               token: token,
             });
           } catch (err) {
             console.log(err);
             res.status(400).json({
-              status: 'failed  ',
-              message: 'unable to register user',
+              status: "failed  ",
+              message: "unable to register user",
             });
           }
         } else {
           res.status(400).json({
-            status: 'failed  ',
-            message: 'Password and password confirmation do not match',
+            status: "failed  ",
+            message: "Password and password confirmation do not match",
           });
         }
       } else {
         res.status(400).json({
-          status: 'failed  ',
-          message: 'All fields are required',
+          status: "failed  ",
+          message: "All fields are required",
         });
       }
     }
