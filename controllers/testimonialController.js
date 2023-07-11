@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const testimonial = require("../models/testimonial");
+const testimonial = require("../models/Testimonial");
 
 class testimonialController {
   static post = (req, res) => {

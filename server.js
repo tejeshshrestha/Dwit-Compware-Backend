@@ -18,7 +18,7 @@ connectDB(DATABASE_URL);
 
 //routes
 const userRoutes = require("./routes/userRoutes");
-const factRoutes = require("./routes/factRoutes");
+const factRoutes = require("./routes/factRouter");
 const courseRoutes = require("./routes/courseRouter");
 const testimonialRoutes = require("./routes/testimonialRouter");
 const vacancyRoutes = require("./routes/vacancyRouter");
@@ -27,6 +27,7 @@ const notificationRoutes = require("./routes/notificationRouter");
 const sessionRoutes = require("./routes/sessionRouter");
 const galleryRoutes = require("./routes/galleryRouter");
 const emailRoutes = require("./routes/emailRouter");
+const teamRoutes = require("./routes/teamRouter");
 
 app.use(fileUpload());
 
@@ -40,6 +41,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/session", sessionRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/sendEmail", emailRoutes);
+app.use("/api/team", teamRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
