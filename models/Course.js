@@ -5,6 +5,7 @@ const courseSchema = mongoose.Schema({
   courseName: {
     type: String,
     required: true,
+    unique: true,
   },
   slugTitle: {
     type: String,

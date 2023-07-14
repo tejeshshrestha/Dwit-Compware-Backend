@@ -3,7 +3,7 @@ const team = require("../models/Team");
 
 class teamController {
   static post = (req, res) => {
-    const { Name, Email, Post, Description, ImageName, ImageAltName } =
+    const { Name, Email, Post, Description, ImageName, ImageAltText } =
       req.body;
     const file = req.files.Image;
 
@@ -22,7 +22,7 @@ class teamController {
       Email,
       Post,
       Description,
-      ImageAltName,
+      ImageAltText,
       ImageName,
       Image: filename,
     });
@@ -38,7 +38,7 @@ class teamController {
   };
 
   static patch = (req, res) => {
-    const { Name, Email, Post, Description, ImageName, ImageAltName } =
+    const { Name, Email, Post, Description, ImageName, Image, ImageAltText } =
       req.body;
     const teamId = req.params.id;
     if (Image) {
@@ -64,7 +64,7 @@ class teamController {
           Post,
           Description,
           ImageName,
-          ImageAltName,
+          ImageAltText,
         },
         { new: true }
       )
@@ -77,7 +77,7 @@ class teamController {
       .catch(() => res.status(500).end());
   };
 
-  static delelte = (req, res) => {
+  static delete = (req, res) => {
     const Id = req.params.id;
     team
       .deleteOne({ _id: Id })

@@ -4,6 +4,7 @@ const testimonialSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   affiliation: {
     type: String,

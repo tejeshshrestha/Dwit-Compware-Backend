@@ -15,13 +15,10 @@ class factController {
       .catch((error) => res.status(500).send({ error: error.message }));
   };
 
-  static get = async (req, res, next) => {
-    try {
-      const fact = await Facts.find({});
-      res.send(fact);
-    } catch (error) {
-      next(error);
-    }
+  static get = (req, res) => {
+    Fact.find({})
+      .then((result) => res.send(result))
+      .catch((error) => res.status(500).send({ error: error.message }));
   };
 
   static patch = (req, res) => {

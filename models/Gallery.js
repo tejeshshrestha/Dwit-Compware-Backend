@@ -8,6 +8,7 @@ const gallerySchema = mongoose.Schema({
   ImageName: {
     type: String,
     required: true,
+    unique: true,
   },
   ImageAltText: {
     type: String,

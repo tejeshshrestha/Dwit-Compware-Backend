@@ -12,6 +12,7 @@ const notificationSchema = mongoose.Schema({
   link: {
     type: String,
     required: true,
+    unique: true,
   },
 });
 

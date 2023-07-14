@@ -3,7 +3,15 @@ const vacancy = require("../models/Vacancy");
 
 class vacancyController {
   static post = (req, res) => {
-    const { companyName, position, description, deadline } = req.body;
+    const {
+      companyName,
+      slugTitle,
+      position,
+      description,
+      deadline,
+      logoImageFileName,
+      descriptionLink,
+    } = req.body;
 
     const file = req.files.companyLogo;
 
@@ -23,9 +31,12 @@ class vacancyController {
     const Vacancy = new vacancy({
       companyName,
       position,
+      slugTitle,
       description,
       deadline,
       companyLogo: fileName,
+      logoImageFileName,
+      descriptionLink,
     });
 
     Vacancy.save()
@@ -41,8 +52,16 @@ class vacancyController {
   };
 
   static patch = (req, res) => {
-    const { companyName, position, description, deadline, companyLogo } =
-      req.body;
+    const {
+      companyName,
+      position,
+      slugTitle,
+      description,
+      deadline,
+      companyLogo,
+      logoImageFileName,
+      descriptionLink,
+    } = req.body;
     const vacancyId = req.params.id;
 
     if (companyLogo) {
@@ -64,9 +83,12 @@ class vacancyController {
         {
           companyName,
           position,
+          slugTitle,
           description,
           deadline,
           companyLogo,
+          logoImageFileName,
+          descriptionLink,
         },
         { new: true }
       )

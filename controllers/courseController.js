@@ -8,23 +8,34 @@ class courseController {
       courseCategory,
       courseIntro,
       aboutCourse,
-      courseLogo,
       imageName,
       imageAltText,
-      coursePdf,
     } = req.body;
 
     const file1 = req.files.courseLogo;
+    console.log(file1);
     const file2 = req.files.coursePdf;
-    const timestamp = Date.now();
-    const fileName = `photo_${timestamp}.jpeg`;
+    console.log(file2);
 
-    file.mv(`./storage/${fileName}`, (error) => {
+    //courseLogo is object => Name.md5 + concatenate with Date.now()
+    const timestamp = Date.now();
+
+    const courseLogo = file1.md5 + timestamp;
+    file1.mv(`./storage/${courseLogo}`, (error) => {
       if (error) {
         return res.status(500).send(error);
       }
       console.log("Upload Successful!");
     });
+
+    const coursePdf = file2.md5 + timestamp;
+    file2.mv(`./storage/${coursePdf}`, (error) => {
+      if (error) {
+        return res.status(500).send(error);
+      }
+      console.log("Upload Successful!");
+    });
+
     const course = new Course({
       courseName,
       slugTitle,
@@ -59,7 +70,38 @@ class courseController {
       coursePdf,
     } = req.body;
 
-    const courseId = req.params;
+    const courseId = req.params.id;
+
+    if (courseLogo) {
+      const file1 = req.files.courselogo;
+      const timestamp = Date.now();
+      const fileName1 = file1.md5 + timestamp;
+
+      file1.mv(`./storage/${fileName1}`),
+        (error) => {
+          if (error) {
+            return res.status(500).send(error);
+          }
+          console.log("File Updated!");
+        };
+      courseLogo = fileName1;
+    }
+
+    if (coursePdf) {
+      const file2 = req.files.courselogo;
+      const timestamp = Date.now();
+      const fileName2 = file2.md5 + timestamp;
+
+      file2.mv(`./storage/${fileName2}`),
+        (error) => {
+          if (error) {
+            return res.status(500).send(error);
+          }
+          console.log("File Updated!");
+        };
+      coursePdf = fileName2;
+    }
+
     Course.findByIdAndUpdate(
       courseId,
       {

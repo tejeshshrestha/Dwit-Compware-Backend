@@ -4,13 +4,14 @@ const teamSchema = mongoose.Schema({
   Name: {
     type: String,
     required: true,
+    unique: true,
   },
   Email: {
     type: String,
     required: true,
   },
   Post: {
-    type: { String },
+    type: [String],
     required: true,
   },
   Description: {
@@ -24,6 +25,7 @@ const teamSchema = mongoose.Schema({
   ImageName: {
     type: String,
     required: true,
+    unique: true,
   },
   ImageAltText: {
     type: String,

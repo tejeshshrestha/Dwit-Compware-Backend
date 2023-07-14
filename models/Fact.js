@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-  
+
 const factSchema = mongoose.Schema({
   totalStudents: {
-    type: Number,
+    type: String,
     required: true,
   },
   ratio: {
@@ -10,7 +10,7 @@ const factSchema = mongoose.Schema({
     required: true,
   },
   studentsPerClass: {
-    type: Number,
+    type: String,
     required: true,
   },
 });
