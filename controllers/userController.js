@@ -62,14 +62,14 @@ class UserController {
   };
 
   /* HOW IT WORKS*/
-  //user get link in gmail, he hits' that link , get redirected to dynamic link of front end
+  //users get link in gmail, he hits that link , get redirected to dynamic link of front end
   //  `${process.env.FRONT_END_LINK}/api/users/reset/${user._id}/${token}`;
   // there exist a form with 2 fields, password,confirm password
   // he fill up the form
   // he hits submit button
   // on submit button, he sends a req to this route with :id param , token param that client gets from linkurl,and password and confirm password
   // router.post('/reset-password/:id/:token', userController.userPasswordReset);
-  // then this below function is called
+  // then the function below is called
 
   static userPasswordReset = async (req, res) => {
     const { password, password_confirmation } = req.body;

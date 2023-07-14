@@ -4,6 +4,7 @@ const sessionSchema = mongoose.Schema({
   course: {
     type: [String],
     required: true,
+    unique: true,
   },
   startDate: {
     type: String,
