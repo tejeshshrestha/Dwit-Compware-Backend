@@ -3,11 +3,11 @@ const dotenv = require("dotenv");
 const transporter = require("../config/emailConfig");
 dotenv.config();
 class emailController {
-  static post = (req, res) => {
+  static post = async (req, res) => {
     const { receiverEmail, subject, bodyMessage } = req.body;
     console.log(bodyMessage);
     try {
-      let info = transporter.sendMail({
+      let info = await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: receiverEmail,
         subject: subject,

@@ -1,56 +1,102 @@
 const Enquiry = require("../models/Enquiry");
 
 class enquiryController {
-  static post = (req, res) => {
-    const { name, phoneNum, course, enquiryDate, status } = req.body;
-    const enquiry = new Enquiry({
-      name,
-      phoneNum,
-      course,
-      enquiryDate,
-      status,
-    });
-    enquiry
-      .save()
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static post = async (req, res) => {
+    try {
+      const { name, phoneNum, course, enquiryDate, status } = req.body;
+      const enquiry = await new Enquiry({
+        name,
+        phoneNum,
+        course,
+        enquiryDate,
+        status,
+      });
+      const result = await enquiry.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    Enquiry.find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await Enquiry.find({});
+      if (!result) {
+        throw new Error("No Data");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static patch = (req, res) => {
-    const { name, phoneNum, course, enquiryDate, status } = req.body;
-    const enquiryId = req.params.id;
-    Enquiry.findByIdAndUpdate(
-      enquiryId,
-      { name, phoneNum, course, enquiryDate, status },
-      { new: true }
-    )
-      .then((updatedEnquiry) => {
-        if (!updatedEnquiry) {
-          return res.status(404).send({ error: "Enquiry not found" });
-        }
-        res.send(updatedEnquiry);
-      })
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static patch = async (req, res) => {
+    try {
+      const { name, phoneNum, course, enquiryDate, status } = req.body;
+      const enquiryId = req.params.id;
+      const result = await Enquiry.findByIdAndUpdate(
+        enquiryId,
+        { name, phoneNum, course, enquiryDate, status },
+        { new: true }
+      );
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static getOneEnquiry = (req, res) => {
-    const Id = req.params.id;
-    Enquiry.findOne({ _id: Id })
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static getOneEnquiry = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await Enquiry.findOne({ _id: Id });
+      if (!result) {
+        throw new Error("No data");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    Enquiry.deleteOne({ _id: Id })
-      .then(() => res.send("Deleted Sucessfully"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await Enquiry.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Delete Successful!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 }
 

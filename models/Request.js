@@ -6,19 +6,20 @@ const requestSchema = mongoose.Schema({
     required: true,
   },
   lastName: {
-    type: Number,
+    type: String,
     required: true,
   },
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   course: {
     type: String,
     required: true,
   },
   classSize: {
-    type: String,
+    type: Number,
     required: true,
   },
   level: {
@@ -26,7 +27,7 @@ const requestSchema = mongoose.Schema({
     required: true,
   },
   startDate: {
-    type: String,
+    type: Number,
     required: true,
   },
   requestedDate: {

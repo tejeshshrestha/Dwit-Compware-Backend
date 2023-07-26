@@ -1,55 +1,98 @@
 const Fact = require("../models/Fact");
-//import { Fact } from "../models/Fact";
 
 class factController {
-  static post = (req, res) => {
-    const { totalStudents, ratio, studentsPerClass } = req.body;
-    const fact = new Fact({
-      totalStudents,
-      ratio,
-      studentsPerClass,
-    });
-    fact
-      .save()
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static post = async (req, res) => {
+    try {
+      const { totalStudents, ratio, studentsPerClass } = req.body;
+      const fact = new Fact({
+        totalStudents,
+        ratio,
+        studentsPerClass,
+      });
+      const result = await fact.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    Fact.find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = Fact.find({});
+      if (!result) {
+        throw new Error("No data");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static patch = (req, res) => {
-    const { totalStudents, ratio, studentsPerClass } = req.body;
-    const factId = req.params.id;
-    Fact.findByIdAndUpdate(
-      factId,
-      { totalStudents, ratio, studentsPerClass },
-      { new: true }
-    )
-      .then((updatedFact) => {
-        if (!updatedFact) {
-          return res.status(404).send({ error: "Fact not found" });
-        }
-        res.send(updatedFact);
-      })
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static patch = async (req, res) => {
+    try {
+      const { totalStudents, ratio, studentsPerClass } = req.body;
+      const factId = req.params.id;
+      const result = await Fact.findByIdAndUpdate(
+        factId,
+        { totalStudents, ratio, studentsPerClass },
+        { new: true }
+      );
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
-
   static getOneFact = (req, res) => {
-    const Id = req.params.id;
-    Fact.findOne({ _id: Id })
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+    try {
+      const Id = req.params.id;
+      const result = Fact.findOne({ _id: Id });
+      if (!result) {
+        throw new Error("No data");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    Fact.deleteOne({ _id: Id })
-      .then((done) => res.send("Deleted Sucessfully"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = Fact.deleteOne({ _id: Id });
+      res.status(200).json({
+        status: true,
+        msg: "Deleted!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 }
 

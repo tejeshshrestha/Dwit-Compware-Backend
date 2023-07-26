@@ -1,63 +1,83 @@
 const Course = require("../models/Course");
 
 class courseController {
-  static post = (req, res) => {
-    const {
-      courseName,
-      slugTitle,
-      courseCategory,
-      courseIntro,
-      aboutCourse,
-      imageName,
-      imageAltText,
-    } = req.body;
+  static post = async (req, res) => {
+    try {
+      const {
+        courseName,
+        slugTitle,
+        courseCategory,
+        courseIntro,
+        aboutCourse,
+        imageName,
+        imageAltText,
+      } = req.body;
 
-    const file1 = req.files.courseLogo;
-    console.log(file1);
-    const file2 = req.files.coursePdf;
-    console.log(file2);
+      const file1 = req.files.courseLogo;
+      console.log(file1);
+      const file2 = req.files.coursePdf;
+      console.log(file2);
 
-    //courseLogo is object => Name.md5 + concatenate with Date.now()
-    const timestamp = Date.now();
+      //courseLogo is object => Name.md5 + concatenate with Date.now()
+      const timestamp = Date.now();
 
-    const courseLogo = file1.md5 + timestamp;
-    file1.mv(`./storage/${courseLogo}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("Upload Successful!");
-    });
+      const courseLogo = file1.md5 + timestamp;
+      file1.mv(`./storage/${courseLogo}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("Upload Successful!");
+      });
 
-    const coursePdf = file2.md5 + timestamp;
-    file2.mv(`./storage/${coursePdf}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("Upload Successful!");
-    });
+      const coursePdf = file2.md5 + timestamp;
+      file2.mv(`./storage/${coursePdf}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("Upload Successful!");
+      });
 
-    const course = new Course({
-      courseName,
-      slugTitle,
-      courseCategory,
-      courseIntro,
-      aboutCourse,
-      courseLogo,
-      imageName,
-      imageAltText,
-      coursePdf,
-    });
-    course
-      .save()
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+      const course = await new Course({
+        courseName,
+        slugTitle,
+        courseCategory,
+        courseIntro,
+        aboutCourse,
+        courseLogo,
+        imageName,
+        imageAltText,
+        coursePdf,
+      });
+      const result = await course.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
-  static get = (req, res) => {
-    Course.find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await Course.find({});
+      if (!result) {
+        throw new Error("no data found");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
-  static patch = (req, res) => {
+  static patch = async (req, res) => {
     const {
       courseName,
       slugTitle,
@@ -101,41 +121,66 @@ class courseController {
         };
       coursePdf = fileName2;
     }
-
-    Course.findByIdAndUpdate(
-      courseId,
-      {
-        courseName,
-        slugTitle,
-        courseCategory,
-        courseIntro,
-        aboutCourse,
-        courseLogo,
-        imageName,
-        imageAltText,
-        coursePdf,
-      },
-      { new: true }
-    )
-      .then((updatedCourse) => {
-        if (!updatedCourse) {
-          return res.status(404).send({ error: "New Course not found" });
-        }
-        res.send(updatedCourse);
-      })
-      .catch((error) => res.status(500).send({ error: error.message }));
+    try {
+      const result = await Course.findByIdAndUpdate(
+        courseId,
+        {
+          courseName,
+          slugTitle,
+          courseCategory,
+          courseIntro,
+          aboutCourse,
+          courseLogo,
+          imageName,
+          imageAltText,
+          coursePdf,
+        },
+        { new: true }
+      );
+      if (!result) {
+        throw new Error("Not Updated");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(404).json({
+        status: false,
+        msg: "Not updated!",
+      });
+    }
   };
-  static getOneCourse = (req, res) => {
+  static getOneCourse = async (req, res) => {
     const Id = req.params.id;
-    Course.findOne({ _id: Id })
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+    try {
+      const result = await Course.findOne({ _id: Id });
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "no such ID",
+      });
+    }
   };
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    Course.deleteOne({ _id: Id })
-      .then((work) => res.send("Deleted Successfully"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await Course.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Delete Successful!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        message: error,
+      });
+    }
   };
 }
 

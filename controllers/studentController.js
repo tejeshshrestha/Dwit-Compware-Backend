@@ -2,58 +2,76 @@ const { validationResult } = require("express-validator");
 const student = require("../models/studentCertificate");
 
 class studentController {
-  static post = (req, res) => {
-    const {
-      firstName,
-      lastName,
-      email,
-      course,
-      trainer,
-      gender,
-      courseDuration,
-      trainerTitle,
-    } = req.body;
+  static post = async (req, res) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        course,
+        trainer,
+        gender,
+        courseDuration,
+        trainerTitle,
+      } = req.body;
 
-    const file = req.files.photo;
+      const file = req.files.photo;
 
-    console.log("yo", file);
+      console.log(file);
 
-    const timestamp = Date.now();
+      const timestamp = Date.now();
 
-    const fileName = `photo_${timestamp}.jpeg`;
+      const fileName = `photo_${timestamp}.jpeg`;
 
-    file.mv(`./storage/${fileName}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
+      file.mv(`./storage/${fileName}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("File Uploaded!");
+      });
+      const Student = await new student({
+        firstName,
+        lastName,
+        email,
+        course,
+        trainer,
+        gender,
+        courseDuration,
+        trainerTitle,
+        photo: fileName,
+      });
+
+      const result = await Student.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
+  };
+
+  static get = async (req, res) => {
+    try {
+      const data = await student.find({});
+      if (!data) {
+        throw new Error("no data found");
       }
-      console.log("File Uploaded!");
-    });
-
-    const Student = new student({
-      firstName,
-      lastName,
-      email,
-      course,
-      trainer,
-      gender,
-      courseDuration,
-      trainerTitle,
-      photo: fileName,
-    });
-
-    Student.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+      res.status(200).json({
+        status: true,
+        msg: data,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
-
-  static get = (req, res) => {
-    student
-      .find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
-  };
-
-  static patch = (req, res) => {
+  static patch = async (req, res) => {
     const {
       firstName,
       lastName,
@@ -80,8 +98,8 @@ class studentController {
       });
       photo = fileName;
     }
-    student
-      .findByIdAndUpdate(
+    try {
+      const result = await student.findByIdAndUpdate(
         studentId,
         {
           firstName,
@@ -95,23 +113,37 @@ class studentController {
           photo,
         },
         { new: true }
-      )
-      .then((updatedCerti) => {
-        if (updatedCerti) {
-          res.send(updatedCerti);
-        }
-        return res.status(404).send({ error: "No new Certificates found!" });
-      })
-      .catch((error) => res.status(500).end());
+      );
+      if (!result) {
+        throw new Error("Not Updated");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(404).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    student
-      .deleteOne({ _id: Id })
-      .then(() => res.send("Delete Successful!"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await student.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Delete Successful!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        message: error,
+      });
+    }
   };
 }
-
 module.exports = studentController;
