@@ -60,10 +60,10 @@ class factController {
       });
     }
   };
-  static getOneFact = (req, res) => {
+  static getOneFact = async (req, res) => {
     try {
       const Id = req.params.id;
-      const result = Fact.findOne({ _id: Id });
+      const result = await Fact.findOne({ _id: Id });
       if (!result) {
         throw new Error("No data");
       }
@@ -72,7 +72,7 @@ class factController {
         msg: result,
       });
     } catch (error) {
-      res.status(500).json({
+      res.status(404).json({
         status: false,
         msg: error,
       });
@@ -82,7 +82,8 @@ class factController {
   static delete = async (req, res) => {
     try {
       const Id = req.params.id;
-      const result = Fact.deleteOne({ _id: Id });
+      const result = await Fact.deleteOne({ _id: Id });
+      console.log(result);
       res.status(200).json({
         status: true,
         msg: "Deleted!",

@@ -77,7 +77,7 @@ class enquiryController {
     } catch (error) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: "No such ID",
       });
     }
   };

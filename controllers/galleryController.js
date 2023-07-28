@@ -2,35 +2,52 @@ const { validationResult } = require("express-validator");
 const gallery = require("../models/Gallery");
 
 class galleryController {
-  static post = (req, res) => {
-    const { ImageName, ImageAltText } = req.body;
-    const file = req.files.Image;
+  static post = async (req, res) => {
+    try {
+      const { ImageName, ImageAltText } = req.body;
+      const file = req.files.Image;
 
-    const timestamp = Date.now();
-    const filename = `photo_${timestamp}.jpeg`;
+      const timestamp = Date.now();
+      const filename = `photo_${timestamp}.jpeg`;
 
-    file.mv(`./storage/${filename}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("Upload Successful");
-    });
+      file.mv(`./storage/${filename}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("Upload Successful");
+      });
 
-    const Gallery = new gallery({
-      Image: filename,
-      ImageName,
-      ImageAltText,
-    });
-    Gallery.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+      const Gallery = await new gallery({
+        Image: filename,
+        ImageName,
+        ImageAltText,
+      });
+      const result = await Gallery.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    gallery
-      .find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await gallery.find({});
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
   static patch = (req, res) => {
     const { ImageName, ImageAltText, Image } = req.body;

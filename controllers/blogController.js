@@ -102,7 +102,7 @@ class blogController {
   static getOneBlog = async (req, res) => {
     const Id = req.params.id;
     try {
-      const data = await blog.findOne({});
+      const data = await blog.findOne({ _id: Id });
       if (!data) {
         throw new Error("no data found");
       }
@@ -111,7 +111,7 @@ class blogController {
         msg: data,
       });
     } catch (err) {
-      res.status(500).json({
+      res.status(404).json({
         status: false,
         msg: err,
       });

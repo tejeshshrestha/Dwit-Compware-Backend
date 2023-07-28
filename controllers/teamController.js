@@ -2,42 +2,59 @@ const { validationResult } = require("express-validator");
 const team = require("../models/Team");
 
 class teamController {
-  static post = (req, res) => {
-    const { Name, Email, Post, Description, ImageName, ImageAltText } =
-      req.body;
-    const file = req.files.Image;
+  static post = async (req, res) => {
+    try {
+      const { Name, Email, Post, Description, ImageName, ImageAltText } =
+        req.body;
+      const file = req.files.Image;
 
-    const timestamp = Date.now();
-    const filename = `photo_${timestamp}.jpeg`;
+      const timestamp = Date.now();
+      const filename = `photo_${timestamp}.jpeg`;
 
-    file.mv(`./storage/${filename}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("File upload successful!");
-    });
+      file.mv(`./storage/${filename}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("File upload successful!");
+      });
 
-    const Team = new team({
-      Name,
-      Email,
-      Post,
-      Description,
-      ImageAltText,
-      ImageName,
-      Image: filename,
-    });
-    Team.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+      const Team = await new team({
+        Name,
+        Email,
+        Post,
+        Description,
+        ImageAltText,
+        ImageName,
+        Image: filename,
+      });
+      const result = await Team.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
-  static get = (req, res) => {
-    team
-      .find({})
-      .then((result) => res.send(result))
-      .catch((result) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await team.find({});
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 
-  static patch = (req, res) => {
+  static patch = async (req, res) => {
     const { Name, Email, Post, Description, ImageName, Image, ImageAltText } =
       req.body;
     const teamId = req.params.id;
@@ -55,8 +72,8 @@ class teamController {
       });
       Image = filename;
     }
-    team
-      .findByIdAndUpdate(
+    try {
+      const result = await team.findByIdAndUpdate(
         teamId,
         {
           Name,
@@ -67,22 +84,52 @@ class teamController {
           ImageAltText,
         },
         { new: true }
-      )
-      .then((updatedTeam) => {
-        if (!updatedTeam) {
-          return res.status(404).send({ error: "Team not added" });
-        }
-        res.send(updatedTeam);
-      })
-      .catch(() => res.status(500).end());
+      );
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
+  };
+  static getOneTeam = async (req, res) => {
+    const Id = req.paramsid;
+    try {
+      const result = await team.findOne({ _id: Id });
+      if (!result) {
+        throw new Error("No id matches!");
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "No id matches!",
+      });
+    }
   };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    team
-      .deleteOne({ _id: Id })
-      .then(() => res.send("Deleted Successfully"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await team.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Successfully Deleted!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        msg: error,
+      });
+    }
   };
 }
 

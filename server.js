@@ -1,7 +1,6 @@
 const dotenv = require("dotenv");
 const cors = require("cors");
 const express = require("express");
-
 const fileUpload = require("express-fileupload");
 const connectDB = require("./config/connectdb");
 const app = express();
@@ -13,9 +12,10 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // config cors
 app.use(cors());
 //connect to db
-const DATABASE_URL = process.env.DATABASE_URL;
-connectDB(DATABASE_URL);
 
+const DATABASE_URL = process.env.DATABASE_URL;
+
+connectDB(DATABASE_URL);
 //routes
 const userRoutes = require("./routes/userRoutes");
 const factRoutes = require("./routes/factRouter");
@@ -35,7 +35,6 @@ const teacherRoutes = require("./routes/teacherRouter");
 const trainerRoutes = require("./routes/trainerRouter");
 
 app.use(fileUpload());
-
 app.use("/api/users", userRoutes);
 app.use("/api/facts", factRoutes);
 app.use("/api/course", courseRoutes);
@@ -58,7 +57,6 @@ app.get("/", (req, res) => {
     message: "Welcome to the API",
   });
 });
-
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server is runninng in port ${port}`);
