@@ -40,13 +40,10 @@ class blogController {
 
   static get = async (req, res) => {
     try {
-      const data = await blog.find({});
-      if (!data) {
-        throw new Error("no data found");
-      }
+      const result = await blog.find({});
       res.status(200).json({
         status: true,
-        msg: data,
+        msg: result,
       });
     } catch (err) {
       res.status(500).json({
@@ -99,7 +96,7 @@ class blogController {
       });
     }
   };
-  static getOneBlog = async (req, res) => {
+  static getOne = async (req, res) => {
     const Id = req.params.id;
     try {
       const data = await blog.findOne({ _id: Id });
@@ -124,12 +121,12 @@ class blogController {
       console.log(result);
       res.status(200).json({
         status: true,
-        msg: "Delete Successful!",
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        message: error,
+        msg: "Id does not exist!",
       });
     }
   };

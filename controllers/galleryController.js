@@ -27,10 +27,10 @@ class galleryController {
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
@@ -42,14 +42,14 @@ class galleryController {
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
-  static patch = (req, res) => {
+  static patch = async (req, res) => {
     const { ImageName, ImageAltText, Image } = req.body;
     const notificationId = req.params.id;
     if (Image) {
@@ -65,38 +65,64 @@ class galleryController {
       });
       Image = fileName;
     }
-    gallery
-      .findByIdAndUpdate(
+    try {
+      const result = await gallery.findByIdAndUpdate(
         notificationId,
         {
           ImageName,
           ImageAltText,
         },
         { new: true }
-      )
-      .then((updatedGallery) => {
-        if (updatedGallery) {
-          res.send(updatedGallery);
-        }
-        return res.status(404).send({ error: "Not Added" });
-      })
-      .catch(() => res.status(500).end());
+      );
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Check Id again",
+      });
+    }
   };
 
-  // static getOneNoti = (req, res) => {
-  //   const Id = req.params.id;
-  //   notifications
-  //     .findOne({ _id: Id })
-  //     .then((result) => res.send(result))
-  //     .catch((error) => res.status(500).send({ error: error.message }));
-  // };
+  static getOne = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await gallery.findOne({ _id: Id });
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Invalid ID",
+      });
+    }
+  };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    gallery
-      .deleteOne({ _id: Id })
-      .then(() => res.send("It's been Deleted!"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await gallery.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Deletion Successful!",
+      });
+    } catch (err) {
+      res.status(400).json({
+        status: false,
+        msg: "Id does not exist!",
+      });
+    }
   };
 }
 

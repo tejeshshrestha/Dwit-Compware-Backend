@@ -2,43 +2,59 @@ const { validationResult } = require("express-validator");
 const testimonial = require("../models/Testimonial");
 
 class testimonialController {
-  static post = (req, res) => {
-    const { name, affiliation, description, imageName, imageAltText } =
-      req.body;
-    const file = req.files.image;
+  static post = async (req, res) => {
+    try {
+      const { name, affiliation, description, imageName, imageAltText } =
+        req.body;
+      const file = req.files.image;
 
-    const timestamp = Date.now();
-    const fileName = `photo_${timestamp}.jpeg`;
+      const timestamp = Date.now();
+      const fileName = `photo_${timestamp}.jpeg`;
 
-    file.mv(`./storage/${fileName}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("File Uploaded");
-    });
+      file.mv(`./storage/${fileName}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("File Uploaded");
+      });
 
-    const Testimonial = new testimonial({
-      name,
-      affiliation,
-      description,
-      image: fileName,
-      imageName,
-      imageAltText,
-    });
-
-    Testimonial.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+      const Testimonial = new testimonial({
+        name,
+        affiliation,
+        description,
+        image: fileName,
+        imageName,
+        imageAltText,
+      });
+      const result = await Testimonial.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    testimonial
-      .find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await testimonial.find({});
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
 
-  static patch = (req, res) => {
+  static patch = async (req, res) => {
     const { name, affiliation, description, imageName, imageAltText } =
       req.body;
     const testimonialId = req.params.id;
@@ -53,8 +69,8 @@ class testimonialController {
       }
       console.log("File Uploaded");
     });
-    testimonial
-      .findByIdAndUpdate(
+    try {
+      const result = await testimonial.findByIdAndUpdate(
         testimonialId,
         {
           name,
@@ -65,28 +81,56 @@ class testimonialController {
           imageAltText,
         },
         { new: true }
-      )
-      .then((updatedTestimonial) => {
-        if (!updatedTestimonial) {
-          return res.status(404).send({ error: "New Testimonial not found" });
-        }
-        res.send(updatedTestimonial);
-      })
-      .catch((error) => res.status(500).send({ error: error.message }));
+      );
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Check Id again",
+      });
+    }
   };
-  static getOneTestimonial = (req, res) => {
-    const Id = req.params.id;
-    testimonial
-      .findOne({ _id: Id })
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+
+  static getOne = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await testimonial.findOne({ _id: Id });
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Invalid ID",
+      });
+    }
   };
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    testimonial
-      .deleteOne({ _id: Id })
-      .then(() => res.send("Deleted Successfully"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      result = await testimonial.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Deletion Successful!",
+      });
+    } catch (err) {
+      res.status(400).json({
+        status: false,
+        msg: "Id does not exist!",
+      });
+    }
   };
 }
 

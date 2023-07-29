@@ -2,43 +2,59 @@ const { validationResult } = require("express-validator");
 const trainer = require("../models/Trainer");
 
 class trainerController {
-  static post = (req, res) => {
-    const { trainerName, trainerTitle } = req.body;
+  static post = async (req, res) => {
+    try {
+      const { trainerName, trainerTitle } = req.body;
 
-    const file = req.files.signature;
+      const file = req.files.signature;
 
-    console.log("yo", file);
+      console.log("yo", file);
 
-    const timestamp = Date.now();
+      const timestamp = Date.now();
 
-    const fileName = `photo_${timestamp}.jpeg`;
+      const fileName = `photo_${timestamp}.jpeg`;
 
-    file.mv(`./storage/${fileName}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("File Uploaded!");
-    });
+      file.mv(`./storage/${fileName}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("File Uploaded!");
+      });
 
-    const Trainer = new trainer({
-      trainerName,
-      signature: fileName,
-      trainerTitle,
-    });
+      const Trainer = new trainer({
+        trainerName,
+        signature: fileName,
+        trainerTitle,
+      });
 
-    Trainer.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+      const result = await Trainer.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
+  };
+  static get = async (req, res) => {
+    try {
+      const result = await trainer.find({});
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    trainer
-      .find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
-  };
-
-  static patch = (req, res) => {
+  static patch = async (req, res) => {
     const { trainerName, signature, trainerTitle } = req.body;
     const trainerId = req.params.id;
 
@@ -55,8 +71,8 @@ class trainerController {
       });
       signature = fileName;
     }
-    trainer
-      .findByIdAndUpdate(
+    try {
+      const result = await trainer.findByIdAndUpdate(
         trainerId,
         {
           trainerName,
@@ -64,22 +80,56 @@ class trainerController {
           trainerTitle,
         },
         { new: true }
-      )
-      .then((updated) => {
-        if (updated) {
-          res.send(updated);
-        }
-        return res.status(404).send({ error: "No new trainer found!" });
-      })
-      .catch((error) => res.status(500).end());
+      );
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Check Id again",
+      });
+    }
   };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    trainer
-      .deleteOne({ _id: Id })
-      .then(() => res.send("Delete Successful!"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static getOne = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await trainer.findOne({ _id: Id });
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Invalid ID",
+      });
+    }
+  };
+
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      result = await trainer.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Deletion Successful!",
+      });
+    } catch (err) {
+      res.status(400).json({
+        status: false,
+        msg: "Id does not exist!",
+      });
+    }
   };
 }
 

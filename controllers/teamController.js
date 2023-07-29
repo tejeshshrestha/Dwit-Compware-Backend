@@ -96,7 +96,7 @@ class teamController {
       });
     }
   };
-  static getOneTeam = async (req, res) => {
+  static getOne = async (req, res) => {
     const Id = req.paramsid;
     try {
       const result = await team.findOne({ _id: Id });
@@ -122,12 +122,12 @@ class teamController {
       console.log(result);
       res.status(200).json({
         status: true,
-        msg: "Successfully Deleted!",
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        msg: error,
+        msg: "Id does not exist!",
       });
     }
   };

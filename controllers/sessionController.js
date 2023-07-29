@@ -2,31 +2,49 @@ const { validationResult } = require("express-validator");
 const session = require("../models/session");
 
 class sessionController {
-  static post = (req, res) => {
-    const { course, startDate, courseDuration, start, end } = req.body;
-    const Session = new session({
-      course,
-      startDate,
-      courseDuration,
-      start,
-      end,
-    });
-    Session.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+  static post = async (req, res) => {
+    try {
+      const { course, startDate, courseDuration, start, end } = req.body;
+      const Session = new session({
+        course,
+        startDate,
+        courseDuration,
+        start,
+        end,
+      });
+      const result = await Session.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    session
-      .find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await session.find({});
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
-  static patch = (req, res) => {
+
+  static patch = async (req, res) => {
     const { course, startDate, courseDuration, start, end } = req.body;
     const sessionId = req.params.id;
-    session
-      .findByIdAndUpdate(
+    try {
+      const result = await session.findByIdAndUpdate(
         sessionId,
         {
           course,
@@ -36,30 +54,56 @@ class sessionController {
           end,
         },
         { new: true }
-      )
-      .then((updatedSes) => {
-        if (updatedSes) {
-          res.send(updatedSes);
-        }
-        return res.status(404).send({ error: "Not Added" });
-      })
-      .catch(() => res.status(500).end());
+      );
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Check Id again",
+      });
+    }
   };
 
-  // static getOneNoti = (req, res) => {
-  //   const Id = req.params.id;
-  //   notifications
-  //     .findOne({ _id: Id })
-  //     .then((result) => res.send(result))
-  //     .catch((error) => res.status(500).send({ error: error.message }));
-  // };
+  static getOne = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await session.findOne({ _id: Id });
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Invalid ID",
+      });
+    }
+  };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    session
-      .deleteOne({ _id: Id })
-      .then(() => res.send("It's been Deleted!"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      result = await session.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Deletion Successful!",
+      });
+    } catch (err) {
+      res.status(400).json({
+        status: false,
+        msg: "Id does not exist!",
+      });
+    }
   };
 }
 

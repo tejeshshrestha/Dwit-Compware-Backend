@@ -46,23 +46,20 @@ class studentController {
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
 
   static get = async (req, res) => {
     try {
-      const data = await student.find({});
-      if (!data) {
-        throw new Error("no data found");
-      }
+      const result = await student.find({});
       res.status(200).json({
         status: true,
-        msg: data,
+        msg: result,
       });
     } catch (err) {
       res.status(500).json({
@@ -71,6 +68,7 @@ class studentController {
       });
     }
   };
+
   static patch = async (req, res) => {
     const {
       firstName,
@@ -115,16 +113,35 @@ class studentController {
         { new: true }
       );
       if (!result) {
-        throw new Error("Not Updated");
+        throw Error;
       }
       res.status(200).json({
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(404).json({
         status: false,
-        msg: error,
+        msg: "Check Id again",
+      });
+    }
+  };
+
+  static getOne = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await student.findOne({ _id: Id });
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Invalid ID",
       });
     }
   };
@@ -136,12 +153,12 @@ class studentController {
       console.log(result);
       res.status(200).json({
         status: true,
-        msg: "Delete Successful!",
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        message: error,
+        msg: "Id does not exist!",
       });
     }
   };

@@ -24,18 +24,15 @@ class factController {
 
   static get = async (req, res) => {
     try {
-      const result = Fact.find({});
-      if (!result) {
-        throw new Error("No data");
-      }
+      const result = await Fact.find({});
       res.status(200).json({
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
@@ -60,7 +57,7 @@ class factController {
       });
     }
   };
-  static getOneFact = async (req, res) => {
+  static getOne = async (req, res) => {
     try {
       const Id = req.params.id;
       const result = await Fact.findOne({ _id: Id });
@@ -86,15 +83,14 @@ class factController {
       console.log(result);
       res.status(200).json({
         status: true,
-        msg: "Deleted!",
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        msg: error,
+        msg: "Id does not exist!",
       });
     }
   };
 }
-
 module.exports = factController;

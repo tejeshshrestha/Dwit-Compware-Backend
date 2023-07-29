@@ -30,10 +30,10 @@ class requestController {
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
@@ -41,17 +41,14 @@ class requestController {
   static get = async (req, res) => {
     try {
       const result = await Request.find({});
-      if (!result) {
-        throw new Error("No data");
-      }
       res.status(200).json({
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
@@ -97,7 +94,7 @@ class requestController {
     }
   };
 
-  static getOneRequest = async (req, res) => {
+  static getOne = async (req, res) => {
     try {
       const Id = req.params.id;
       const result = await Request.findOne({ _id: Id });
@@ -118,14 +115,15 @@ class requestController {
     try {
       const Id = req.params.id;
       const result = await Request.deleteOne({ _id: Id });
+      console.log(result);
       res.status(200).json({
         status: true,
-        msg: result,
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        msg: error,
+        msg: "Id does not exist!",
       });
     }
   };

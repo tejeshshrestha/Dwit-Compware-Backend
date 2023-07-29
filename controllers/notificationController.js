@@ -2,37 +2,55 @@ const { validationResult } = require("express-validator");
 const notifications = require("../models/Notifications");
 
 class notificationController {
-  static post = (req, res) => {
-    const { footer, link } = req.body;
-    const file = req.files.image;
+  static post = async (req, res) => {
+    try {
+      const { footer, link } = req.body;
+      const file = req.files.image;
 
-    const timestamp = Date.now();
-    const filename = `photo_${timestamp}.jpeg`;
+      const timestamp = Date.now();
+      const filename = `photo_${timestamp}.jpeg`;
 
-    file.mv(`./storage/${filename}`, (error) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      console.log("Upload Successful");
-    });
+      file.mv(`./storage/${filename}`, (error) => {
+        if (error) {
+          return res.status(500).send(error);
+        }
+        console.log("Upload Successful");
+      });
 
-    const Noti = new notifications({
-      image: filename,
-      footer,
-      link,
-    });
-    Noti.save()
-      .then((result) => res.send(result))
-      .catch((error) => res.send(error));
+      const Noti = new notifications({
+        image: filename,
+        footer,
+        link,
+      });
+      const result = await Noti.save();
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
 
-  static get = (req, res) => {
-    notifications
-      .find({})
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static get = async (req, res) => {
+    try {
+      const result = await notifications.find({});
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: false,
+        msg: err,
+      });
+    }
   };
-  static patch = (req, res) => {
+
+  static patch = async (req, res) => {
     const { image, footer, link } = req.body;
     const notificationId = req.params.id;
     if (image) {
@@ -48,8 +66,8 @@ class notificationController {
       });
       image = fileName;
     }
-    notifications
-      .findByIdAndUpdate(
+    try {
+      const result = await notifications.findByIdAndUpdate(
         notificationId,
         {
           image,
@@ -57,30 +75,56 @@ class notificationController {
           link,
         },
         { new: true }
-      )
-      .then((updatedNoti) => {
-        if (updatedNoti) {
-          res.send(updatedNoti);
-        }
-        return res.status(404).send({ error: "Not Added" });
-      })
-      .catch((error) => res.status(500).end());
+      );
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Check Id again",
+      });
+    }
   };
 
-  static getOneNoti = (req, res) => {
-    const Id = req.params.id;
-    notifications
-      .findOne({ _id: Id })
-      .then((result) => res.send(result))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static getOne = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      const result = await notifications.findOne({ _id: Id });
+      if (!result) {
+        throw Error;
+      }
+      res.status(200).json({
+        status: true,
+        msg: result,
+      });
+    } catch (err) {
+      res.status(404).json({
+        status: false,
+        msg: "Invalid ID",
+      });
+    }
   };
 
-  static delete = (req, res) => {
-    const Id = req.params.id;
-    notifications
-      .deleteOne({ _id: Id })
-      .then(() => res.send("It's been Deleted!"))
-      .catch((error) => res.status(500).send({ error: error.message }));
+  static delete = async (req, res) => {
+    try {
+      const Id = req.params.id;
+      result = await notifications.deleteOne({ _id: Id });
+      console.log(result);
+      res.status(200).json({
+        status: true,
+        msg: "Deletion Successful!",
+      });
+    } catch (err) {
+      res.status(400).json({
+        status: false,
+        msg: "Id does not exist!",
+      });
+    }
   };
 }
 

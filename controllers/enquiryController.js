@@ -27,17 +27,14 @@ class enquiryController {
   static get = async (req, res) => {
     try {
       const result = await Enquiry.find({});
-      if (!result) {
-        throw new Error("No Data");
-      }
       res.status(200).json({
         status: true,
         msg: result,
       });
-    } catch (error) {
+    } catch (err) {
       res.status(500).json({
         status: false,
-        msg: error,
+        msg: err,
       });
     }
   };
@@ -63,7 +60,7 @@ class enquiryController {
     }
   };
 
-  static getOneEnquiry = async (req, res) => {
+  static getOne = async (req, res) => {
     try {
       const Id = req.params.id;
       const result = await Enquiry.findOne({ _id: Id });
@@ -89,12 +86,12 @@ class enquiryController {
       console.log(result);
       res.status(200).json({
         status: true,
-        msg: "Delete Successful!",
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        msg: error,
+        msg: "Id does not exist!",
       });
     }
   };

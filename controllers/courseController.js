@@ -63,9 +63,6 @@ class courseController {
   static get = async (req, res) => {
     try {
       const result = await Course.find({});
-      if (!result) {
-        throw new Error("no data found");
-      }
       res.status(200).json({
         status: true,
         msg: result,
@@ -151,7 +148,7 @@ class courseController {
       });
     }
   };
-  static getOneCourse = async (req, res) => {
+  static getOne = async (req, res) => {
     const Id = req.params.id;
     try {
       const result = await Course.findOne({ _id: Id });
@@ -173,12 +170,12 @@ class courseController {
       console.log(result);
       res.status(200).json({
         status: true,
-        msg: "Delete Successful!",
+        msg: "Deletion Successful!",
       });
-    } catch (error) {
-      res.status(500).json({
+    } catch (err) {
+      res.status(400).json({
         status: false,
-        message: error,
+        msg: "Id does not exist!",
       });
     }
   };
