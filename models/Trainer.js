@@ -7,11 +7,11 @@ const trainerSchema = mongoose.Schema({
     unique: true,
   },
   signature: {
-    type: [String],
+    type: String,
     required: true,
   },
   trainerTitle: {
-    type: String,
+    type: [String],
     required: true,
   },
 });

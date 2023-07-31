@@ -119,7 +119,7 @@ class testimonialController {
   static delete = async (req, res) => {
     try {
       const Id = req.params.id;
-      result = await testimonial.deleteOne({ _id: Id });
+      const result = await testimonial.deleteOne({ _id: Id });
       console.log(result);
       res.status(200).json({
         status: true,

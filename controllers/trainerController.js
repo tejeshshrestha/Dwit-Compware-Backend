@@ -21,7 +21,7 @@ class trainerController {
         console.log("File Uploaded!");
       });
 
-      const Trainer = new trainer({
+      const Trainer = await new trainer({
         trainerName,
         signature: fileName,
         trainerTitle,
@@ -118,7 +118,7 @@ class trainerController {
   static delete = async (req, res) => {
     try {
       const Id = req.params.id;
-      result = await trainer.deleteOne({ _id: Id });
+      const result = await trainer.deleteOne({ _id: Id });
       console.log(result);
       res.status(200).json({
         status: true,

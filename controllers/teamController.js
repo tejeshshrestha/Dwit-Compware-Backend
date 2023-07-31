@@ -96,12 +96,13 @@ class teamController {
       });
     }
   };
+
   static getOne = async (req, res) => {
-    const Id = req.paramsid;
     try {
+      const Id = req.params.id;
       const result = await team.findOne({ _id: Id });
       if (!result) {
-        throw new Error("No id matches!");
+        throw Error;
       }
       res.status(200).json({
         status: true,
@@ -110,7 +111,7 @@ class teamController {
     } catch (err) {
       res.status(404).json({
         status: false,
-        msg: "No id matches!",
+        msg: "Invalid ID",
       });
     }
   };

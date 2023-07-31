@@ -6,7 +6,7 @@ const teacherSchema = mongoose.Schema({
     required: true,
   },
   lastName: {
-    type: Number,
+    type: String,
     required: true,
   },
   gender: {

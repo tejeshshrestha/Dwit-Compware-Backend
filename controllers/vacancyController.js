@@ -146,7 +146,7 @@ class vacancyController {
   static delete = async (req, res) => {
     try {
       const vacancyId = req.params.id;
-      result = await vacancy.deleteOne({ _id: vacancyId });
+      const result = await vacancy.deleteOne({ _id: vacancyId });
       console.log(result);
       res.status(200).json({
         status: true,
