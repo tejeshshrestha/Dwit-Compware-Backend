@@ -113,7 +113,7 @@ class notificationController {
   static delete = async (req, res) => {
     try {
       const Id = req.params.id;
-      result = await notifications.deleteOne({ _id: Id });
+      const result = await notifications.deleteOne({ _id: Id });
       console.log(result);
       res.status(200).json({
         status: true,
